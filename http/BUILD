@@ -44,3 +44,17 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    visibility = ["//visibility:public"],
+    name = "file_resource",
+    srcs = ["file_resource.cc"],
+    hdrs = ["file_resource.h"],
+    deps = [
+        "@com_github_bcsgh_utilities//http:content_type",
+        "@com_github_etr_libhttpserver//:libhttpserver",
+        "@com_github_glog_glog//:glog",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/strings",
+    ],
+)
