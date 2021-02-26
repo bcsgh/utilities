@@ -5,13 +5,15 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 #############################################
 git_repository(
     name = "com_google_googletest",
+    commit = "609281088cfefc76f9d0ce82e1ff6c30cc3591e5",  # current as of 2021/02/17
+    shallow_since = "1613065794 -0500",
     remote = "git://github.com/google/googletest.git",
-    tag = "release-1.10.0",  # current as of 2020/1/25
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "44427702614d7b86b064ba06a390f5eb2f85dbf6",  # current as of 2020/1/25
+    commit = "143a27800eb35f4568b9be51647726281916aac9",  # current as of 2021/02/17
+    shallow_since = "1613186346 -0500",
     remote = "git://github.com/abseil/abseil-cpp.git",
 )
