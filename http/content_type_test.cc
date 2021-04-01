@@ -67,9 +67,9 @@ INSTANTIATE_TEST_SUITE_P(
                       Case{"p7.txt", content_type::kTextPlain},
                       Case{"file.unknown", content_type::kTextPlain},
                       Case{"hello_world", content_type::kTextPlain}),
-    [](const testing::TestParamInfo<Case>& c) {
+    [](const testing::TestParamInfo<Case>& cs) {
       std::string ret;
-      for (const auto c : c.param.path) {
+      for (const auto c : cs.param.path) {
         if (('0' <= c && c <= '9') ||  //
             ('A' <= c && c <= 'Z') ||  //
             ('a' <= c && c <= 'z')) {
