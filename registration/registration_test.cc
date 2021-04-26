@@ -55,8 +55,8 @@ TEST(RegistrationTest, Basic) {
   EXPECT_THAT(v, UnorderedElementsAre(6, 9));
 }
 
-struct BX {};
-struct DX : public BX {};
+struct BX { virtual void F() = 0; };
+struct DX : public BX { void F() override {} };
 Register<BX, DX> bx_dx_test;
 
 TEST(RegistrationTest, Other) {

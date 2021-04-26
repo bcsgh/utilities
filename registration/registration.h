@@ -77,13 +77,13 @@ class Registrar {
   // Return a default set of instances.
   // These are on on-demand constructed once
   // per process and ownership is retained.
-  static const std::vector<Base>& GetDefault() {
+  static const std::vector<Base*>& GetDefault() {
     // grab this only the first time.
     static auto *hold = new auto{Make()};
     static auto *ret = [] {
-      auto *x = new std::vector<Base>;
+      auto *x = new std::vector<Base*>;
       x->reserve(hold->size());
-      for(const auto i : *hold) x.push_back(&i);
+      for(const auto &i : *hold) x->push_back(i.get());
       return x;
     }();
     return *ret;
