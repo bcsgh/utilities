@@ -35,7 +35,6 @@
 #include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/descriptor_database.h"
 #include "js_proto/generate_extern.h"
 
 ABSL_FLAG(std::string, proto_file_name, "",
@@ -47,68 +46,68 @@ ABSL_FLAG(std::string, output, "",  //
           "The name of the file to output to.");
 
 using google::protobuf::DescriptorPool;
+using google::protobuf::FileDescriptor;
 using google::protobuf::FileDescriptorSet;
-using google::protobuf::SimpleDescriptorDatabase;
 
 int main(int argc, char** argv) {
   auto args = absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(args[0]);
 
-  const auto* pool = google::protobuf::DescriptorPool::generated_pool();
-  std::string file_name = absl::GetFlag(FLAGS_proto_file_name);
+  const FileDescriptor* file = nullptr;
 
   // Allow these to hang around
-  std::unique_ptr<SimpleDescriptorDatabase> load_db;
   std::unique_ptr<DescriptorPool> load_pool;
 
-  // If we are given descriptor_file_name, use that.
   if (!absl::GetFlag(FLAGS_descriptor_file_name).empty()) {
+    // We were given descriptor_file_name, use that.
     std::ifstream istr;
     istr.open(absl::GetFlag(FLAGS_descriptor_file_name));
     if (!istr.is_open()) {
-      std::cerr << "Error opening '" << absl::GetFlag(FLAGS_descriptor_file_name) << "': " << strerror(errno) << "\n";
+      std::cerr << "Error opening '"
+                << absl::GetFlag(FLAGS_descriptor_file_name)
+                << "': " << strerror(errno) << "\n";
       return 4;
     }
 
     FileDescriptorSet file_desc;
     if (!file_desc.ParseFromIstream(&istr)) {
-      std::cerr << "Failed to parse proto from '" << absl::GetFlag(FLAGS_descriptor_file_name) << "'\n";
+      std::cerr << "Failed to parse proto from '"
+                << absl::GetFlag(FLAGS_descriptor_file_name) << "'\n";
       return 5;
     }
     if (file_desc.file_size() != 1) {
-      std::cerr << "Exactly one file must be provided, found " << file_desc.file_size() << "\n";
+      std::cerr << "Exactly one file must be provided, found "
+                << file_desc.file_size() << "\n";
       for (const auto& f : file_desc.file()) std::cerr << f.name() << "\n";
       return 6;
     }
 
-    file_name = file_desc.file(0).name();
+    load_pool = std::make_unique<DescriptorPool>();
+    load_pool->AllowUnknownDependencies();
+    file = load_pool->BuildFile(file_desc.file(0));
 
-    load_db = std::make_unique<SimpleDescriptorDatabase>();
-    load_db->Add(file_desc.file(0));
+  } else if (!absl::GetFlag(FLAGS_proto_file_name).empty()) {
+    // Use the built in pool if given proto_file_name
+    file = google::protobuf::DescriptorPool::generated_pool()  //
+               ->FindFileByName(absl::GetFlag(FLAGS_proto_file_name));
 
-    load_pool = std::make_unique<DescriptorPool>(load_db.get());
-    pool = load_pool.get();
+    if (!file) {
+      std::cerr << "Failed to find file: '"  //
+                << absl::GetFlag(FLAGS_proto_file_name) << "'\n";
+      /*  A hack using internal APIs to see what files exist
+      std::vector<std::string> all;
+      google::protobuf::DescriptorPool::internal_generated_database()
+          ->FindAllFileNames(&all);
+      for (const auto& f : all) std::cerr << f << "\n";
+      // */
+      return 2;
+    }
   }
-
-  if (!pool || file_name.empty()) {
-    std::cerr << "Internal error\n";
-    return 1;
-  }
-  auto file = pool->FindFileByName(file_name);
 
   if (!file) {
-    std::cerr << "Failed to find file: '"  //
-              << absl::GetFlag(FLAGS_proto_file_name) << "'\n";
-
-    /*  A hack to see what files exist
-    std::vector<std::string> all;
-    google::protobuf::DescriptorPool::internal_generated_database()->FindAllFileNames(&all);
-    for (const auto& f : all) std::cerr << f << "\n";
-    // */
-
-    return 2;
+    std::cerr << "No source provided\n";
+    return 1;
   }
-
   js_proto::ProtoJsonApi process;
   process.ProcessFile(file);
 
