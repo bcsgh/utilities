@@ -30,6 +30,7 @@ cc_proto_library(
     protoc = "@google_protobuf//:protoc",
     default_runtime = "@google_protobuf//:protobuf",
     testonly = True,
+    alwayslink = True,
 )
 
 cc_proto_library(
