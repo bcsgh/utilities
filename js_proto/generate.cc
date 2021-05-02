@@ -25,6 +25,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -36,6 +37,8 @@
 ABSL_FLAG(std::string, proto_file_name, "",
           "The name of the file to generated for. "
           "The file must be linked into the binary.");
+ABSL_FLAG(std::string, output, "",  //
+          "The name of the file to output to.");
 
 int main(int argc, char** argv) {
   auto args = absl::ParseCommandLine(argc, argv);
@@ -54,7 +57,20 @@ int main(int argc, char** argv) {
   js_proto::ProtoJsonApi process;
   process.ProcessFile(file);
 
-  std::cout << process.ToString() << std::flush;
+  if (absl::GetFlag(FLAGS_output).empty()) {
+    std::cout << process.ToString() << std::flush;
+  } else {
+    std::ofstream ostr;
+    ostr.open(absl::GetFlag(FLAGS_output));
+    if (!ostr.is_open()) {
+      std::cerr  //
+          << "Failed to open file: '" << absl::GetFlag(FLAGS_output) << "'";
+      return 3;
+    }
+
+    ostr << process.ToString() << std::flush;
+    ostr.close();
+  }
 
   return 0;
 }
