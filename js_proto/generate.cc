@@ -44,7 +44,12 @@ int main(int argc, char** argv) {
   const auto* pool = google::protobuf::DescriptorPool::generated_pool();
   if (!pool) return 1;
   auto file = pool->FindFileByName(absl::GetFlag(FLAGS_proto_file_name));
-  if (!file) return 2;
+
+  if (!file) {
+    std::cerr << "Failed to find file: '"  //
+              << absl::GetFlag(FLAGS_proto_file_name) << "'";
+    return 2;
+  }
 
   js_proto::ProtoJsonApi process;
   process.ProcessFile(file);
