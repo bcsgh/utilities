@@ -13,8 +13,9 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_binary(
     name = "generate",
+    visibility = ["//visibility:public"],
     srcs = ["generate.cc"],
     deps = [
         ":generate_extern",
@@ -31,7 +32,6 @@ cc_proto_library(
     protoc = "@google_protobuf//:protoc",
     default_runtime = "@google_protobuf//:protobuf",
     testonly = True,
-    alwayslink = True,
 )
 
 cc_proto_library(
@@ -41,7 +41,6 @@ cc_proto_library(
     default_runtime = "@google_protobuf//:protobuf",
     deps = [":example2_proto"],
     testonly = True,
-    alwayslink = True,
 )
 
 ########################

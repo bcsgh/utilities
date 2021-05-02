@@ -31,16 +31,48 @@ Generate a closure externs file from a cc_proto_library rule.
 
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library")
 
-def _js_proto_generate_extern(ctx):
-  if len(ctx.attr.cc_proto_library.proto.srcs) != 1:
-    fail("js_proto_extern requiers a cc_proto_library with exactly one source")
+def _extract_proto_descriptor(ctx):
+  ret = ctx.actions.declare_file(ctx.attr.out)
 
+  ctx.actions.run(
+      inputs = depset(ctx.attr.cc_proto_library.proto.srcs + ctx.attr.cc_proto_library.proto.deps.to_list()),
+      tools = [ctx.executable.protoc],
+      outputs = [ret],
+      arguments = [
+        "--include_source_info",
+        "--descriptor_set_out=" + ret.path,
+        ctx.attr.cc_proto_library.proto.srcs[0].path
+      ],
+      executable = ctx.executable.protoc,
+      mnemonic = "ProtoCompile",
+  )
+
+  return [
+    DefaultInfo(files = depset([ret])),
+  ]
+
+extract_proto_descriptor = rule(
+  implementation = _extract_proto_descriptor,
+  attrs = {
+    "out": attr.string(mandatory = True),
+    "cc_proto_library": attr.label(mandatory = True),
+    "protoc": attr.label(
+        cfg = "host",
+        executable = True,
+        allow_single_file = True,
+        default = "@com_google_protobuf//:protoc",
+    ),
+  }
+)
+
+def _js_proto_generate_extern(ctx):
   ret = ctx.actions.declare_file(ctx.attr.out)
   ctx.actions.run(
+    inputs = [ctx.file.descriptor_pb],
     outputs = [ret],
     executable = ctx.executable.tool,
     arguments = [
-      "--proto_file_name=%s" % ctx.attr.cc_proto_library.proto.srcs[0].path,
+      "--descriptor_file_name=%s" % ctx.file.descriptor_pb.path,
       "--output=%s" % ret.path,
     ],
     mnemonic = "PbJsGen",
@@ -58,7 +90,10 @@ js_proto_generate_extern = rule(
         executable = True,
     ),
     "out": attr.string(mandatory = True),
-    "cc_proto_library": attr.label(mandatory = True),
+    "descriptor_pb": attr.label(
+        mandatory = True,
+        allow_single_file = True,
+    ),
   }
 )
 
@@ -70,25 +105,24 @@ def js_proto_extern(name = None, cc_proto_library = None, testonly = False):
       cc_proto_library: a cc_proto_library lable to build from.
       testonly: testonly
     """
-    bin = name + "_generator_bin"
+    ext = name + "_generator_ext"
+    desc = name + ".pb.desc"
     gen = name + "_generate_js"
 
-    native.cc_binary(
-        name = bin,
-        deps = [
-            ":generate",
-            cc_proto_library,
-        ],
+    extract_proto_descriptor(
+        name = ext,
         testonly = testonly,
+        out = desc,
+        # See https://github.com/protocolbuffers/protobuf/blob/master/protobuf.bzl#L299
+        cc_proto_library = cc_proto_library + "_genproto",
     )
 
     js_proto_generate_extern(
         name = gen,
         testonly = testonly,
         out = name + ".pb.js",
-        tool = ":%s" % bin,
-        # See https://github.com/protocolbuffers/protobuf/blob/master/protobuf.bzl#L299
-        cc_proto_library = cc_proto_library + "_genproto",
+        tool = "@com_github_bcsgh_utilities//js_proto:generate",
+        descriptor_pb = ":" + ext,
     )
 
     closure_js_library(
