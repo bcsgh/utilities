@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+package js_proto.test2;
+
+message Imp {
+}

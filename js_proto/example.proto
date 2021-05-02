@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package js_proto.test;
+
+import "js_proto/example2.proto";
+
+message A {
+  message A_Inner {
+    optional int32 a = 1;
+    optional int64 b = 2;
+    optional uint32 c = 3;
+    required uint64 d = 4;
+    optional sint32 e = 5;
+    optional sint64 f = 6;
+    optional fixed32 k = 11;
+    optional fixed64 l = 12;
+    optional sfixed32 m = 13;
+    optional sfixed64 n = 14;
+
+    repeated string g = 7;
+    repeated bytes h = 8;
+    
+    repeated float i = 9;
+    repeated double j = 10;
+
+    repeated bool o = 15;
+    
+    enum E_Inner {
+      I = 1;
+      J = 2;
+      K = 3;
+    }
+  }
+  required A_Inner inner_type = 1;
+}
+
+enum E {
+  Z = 1;
+  Y = 2;
+  X = 3;
+}
+
+message B {
+  optional A.A_Inner ai = 1;
+  optional A a = 2;
+  repeated js_proto.test2.Imp imp = 3;
+}
