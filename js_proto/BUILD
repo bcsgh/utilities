@@ -71,14 +71,14 @@ genrule(
 
 closure_js_library(
     name = "generate_example_js",
-    srcs = ["example.gold.js"],
+    srcs = ["example.pb.js"],
     deps = [":generate_example2_js"],
     testonly = True,
 )
 
 closure_js_library(
     name = "generate_example2_js",
-    srcs = ["example2.gold.js"],
+    srcs = ["example2.pb.js"],
     testonly = True,
 )
 
