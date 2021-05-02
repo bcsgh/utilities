@@ -1,5 +1,6 @@
 load("@google_protobuf//:protobuf.bzl", "cc_proto_library")
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library", "closure_js_test")
+load(":js_proto.bzl", "js_proto_extern")
 
 cc_library(
     name = "generate_extern",
@@ -44,42 +45,15 @@ cc_proto_library(
 )
 
 ########################
-cc_binary(
-    name = "generate_example_bin",
-    deps = [
-        ":generate",
-        ":example_proto",
-        ":example2_proto",
-    ],
-    testonly = True,
-)
-
-genrule(
-    name = "generate_example",
-    testonly = True,
-    tools = [":generate_example_bin"],
-    outs = ["example.pb.js"],
-    cmd = "$(location :generate_example_bin) --proto_file_name=js_proto/example.proto > $@",
-)
-
-genrule(
-    name = "generate_example2",
-    testonly = True,
-    tools = [":generate_example_bin"],
-    outs = ["example2.pb.js"],
-    cmd = "$(location :generate_example_bin) --proto_file_name=js_proto/example2.proto > $@",
-)
-
-closure_js_library(
+js_proto_extern(
     name = "generate_example_js",
-    srcs = ["example.pb.js"],
-    deps = [":generate_example2_js"],
+    cc_proto_library = ":example_proto",
     testonly = True,
 )
 
-closure_js_library(
+js_proto_extern(
     name = "generate_example2_js",
-    srcs = ["example2.pb.js"],
+    cc_proto_library = ":example2_proto",
     testonly = True,
 )
 
