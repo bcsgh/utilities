@@ -171,7 +171,11 @@ void ProtoJsonApi::ProcessFile(const FileDescriptor* file) {
 
   // Declare namespace
   auto js_package = absl::StrReplaceAll(file->package(), {{".", "_"}});
-  blobs_.emplace_back(absl::StrCat("const ", js_package, " = {};"));
+
+  // Note: var must be used here to exploit var's being merged
+  // within a scope (in this case the global scope) to allow mutiple
+  // proto file from the same package to be used in the same binary.
+  blobs_.emplace_back(absl::StrCat("var ", js_package, " = {};"));
 
   blobs_.emplace_back("");
 
