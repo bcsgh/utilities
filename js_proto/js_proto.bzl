@@ -32,69 +32,69 @@ Generate a closure externs file from a cc_proto_library rule.
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library")
 
 def _extract_proto_descriptor(ctx):
-  ret = ctx.actions.declare_file(ctx.attr.out)
+    ret = ctx.actions.declare_file(ctx.attr.out)
 
-  ctx.actions.run(
-      inputs = depset(ctx.attr.cc_proto_library.proto.srcs + ctx.attr.cc_proto_library.proto.deps.to_list()),
-      tools = [ctx.executable.protoc],
-      outputs = [ret],
-      arguments = [
-        "--include_source_info",
-        "--descriptor_set_out=" + ret.path,
-        ctx.attr.cc_proto_library.proto.srcs[0].path
-      ],
-      executable = ctx.executable.protoc,
-      mnemonic = "ProtoCompile",
-  )
+    ctx.actions.run(
+        inputs = depset(ctx.attr.cc_proto_library.proto.srcs + ctx.attr.cc_proto_library.proto.deps.to_list()),
+        tools = [ctx.executable.protoc],
+        outputs = [ret],
+        arguments = [
+            "--include_source_info",
+            "--descriptor_set_out=" + ret.path,
+            ctx.attr.cc_proto_library.proto.srcs[0].path,
+        ],
+        executable = ctx.executable.protoc,
+        mnemonic = "ProtoCompile",
+    )
 
-  return [
-    DefaultInfo(files = depset([ret])),
-  ]
+    return [
+        DefaultInfo(files = depset([ret])),
+    ]
 
 extract_proto_descriptor = rule(
-  implementation = _extract_proto_descriptor,
-  attrs = {
-    "out": attr.string(mandatory = True),
-    "cc_proto_library": attr.label(mandatory = True),
-    "protoc": attr.label(
-        cfg = "host",
-        executable = True,
-        allow_single_file = True,
-        default = "@com_google_protobuf//:protoc",
-    ),
-  }
+    implementation = _extract_proto_descriptor,
+    attrs = {
+        "out": attr.string(mandatory = True),
+        "cc_proto_library": attr.label(mandatory = True),
+        "protoc": attr.label(
+            cfg = "host",
+            executable = True,
+            allow_single_file = True,
+            default = "@com_google_protobuf//:protoc",
+        ),
+    },
 )
 
 def _js_proto_generate_extern(ctx):
-  ret = ctx.actions.declare_file(ctx.attr.out)
-  ctx.actions.run(
-    inputs = [ctx.file.descriptor_pb],
-    outputs = [ret],
-    executable = ctx.executable.tool,
-    arguments = [
-      "--descriptor_file_name=%s" % ctx.file.descriptor_pb.path,
-      "--output=%s" % ret.path,
-    ],
-    mnemonic = "PbJsGen",
-  )
-  return [
-    DefaultInfo(files = depset([ret])),
-  ]
+    ret = ctx.actions.declare_file(ctx.attr.out)
+    ctx.actions.run(
+        inputs = [ctx.file.descriptor_pb],
+        outputs = [ret],
+        executable = ctx.executable.tool,
+        arguments = [
+            "--descriptor_file_name=%s" % ctx.file.descriptor_pb.path,
+            "--output=%s" % ret.path,
+        ],
+        mnemonic = "PbJsGen",
+    )
+    return [
+        DefaultInfo(files = depset([ret])),
+    ]
 
 js_proto_generate_extern = rule(
-  implementation = _js_proto_generate_extern,
-  attrs = {
-    "tool": attr.label(
-        mandatory = True,
-        cfg = "host",
-        executable = True,
-    ),
-    "out": attr.string(mandatory = True),
-    "descriptor_pb": attr.label(
-        mandatory = True,
-        allow_single_file = True,
-    ),
-  }
+    implementation = _js_proto_generate_extern,
+    attrs = {
+        "tool": attr.label(
+            mandatory = True,
+            cfg = "host",
+            executable = True,
+        ),
+        "out": attr.string(mandatory = True),
+        "descriptor_pb": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+        ),
+    },
 )
 
 def js_proto_extern(name = None, cc_proto_library = None, testonly = False):
@@ -130,4 +130,3 @@ def js_proto_extern(name = None, cc_proto_library = None, testonly = False):
         srcs = [":%s" % gen],
         testonly = testonly,
     )
-

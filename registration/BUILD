@@ -36,10 +36,10 @@ cc_library(
 # Extneral use of registration::Register for testing.
 cc_library(
     name = "registration_use",
+    testonly = True,
     srcs = ["registration_use.cc"],
     hdrs = ["registration_use.h"],
     visibility = ["//visibility:public"],
-    testonly = True,
     deps = [
         ":registration",
     ],

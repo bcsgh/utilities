@@ -15,8 +15,8 @@ cc_library(
 
 cc_binary(
     name = "generate",
-    visibility = ["//visibility:public"],
     srcs = ["generate.cc"],
+    visibility = ["//visibility:public"],
     deps = [
         ":generate_extern",
         "@com_google_absl//absl/flags:flag",
@@ -28,32 +28,32 @@ cc_binary(
 ########################
 cc_proto_library(
     name = "example2_proto",
-    srcs = ["example2.proto"],
-    protoc = "@google_protobuf//:protoc",
-    default_runtime = "@google_protobuf//:protobuf",
     testonly = True,
+    srcs = ["example2.proto"],
+    default_runtime = "@google_protobuf//:protobuf",
+    protoc = "@google_protobuf//:protoc",
 )
 
 cc_proto_library(
     name = "example_proto",
-    srcs = ["example.proto"],
-    protoc = "@google_protobuf//:protoc",
-    default_runtime = "@google_protobuf//:protobuf",
-    deps = [":example2_proto"],
     testonly = True,
+    srcs = ["example.proto"],
+    default_runtime = "@google_protobuf//:protobuf",
+    protoc = "@google_protobuf//:protoc",
+    deps = [":example2_proto"],
 )
 
 ########################
 js_proto_extern(
     name = "generate_example_js",
-    cc_proto_library = ":example_proto",
     testonly = True,
+    cc_proto_library = ":example_proto",
 )
 
 js_proto_extern(
     name = "generate_example2_js",
-    cc_proto_library = ":example2_proto",
     testonly = True,
+    cc_proto_library = ":example2_proto",
 )
 
 ########################
@@ -87,8 +87,8 @@ closure_js_test(
     entry_points = ["js_proto/generate_example_test.js"],
     suppress = ["moduleLoad"],
     deps = [
-        ":generate_example_js",
         ":generate_example2_js",
+        ":generate_example_js",
         "@io_bazel_rules_closure//closure/library/testing:asserts",
         "@io_bazel_rules_closure//closure/library/testing:jsunit",
         "@io_bazel_rules_closure//closure/library/testing:testsuite",
