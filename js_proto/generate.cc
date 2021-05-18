@@ -28,7 +28,10 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <memory>
+#include <ostream>
 #include <string>
+#include <vector>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
