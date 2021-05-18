@@ -57,7 +57,7 @@ TEST(JsProto, Basic) {
 )JS", R"JS(
  * @public
 )JS", R"JS(
-const js_proto_test = {};
+var js_proto_test = {};
 )JS", R"JS(
 js_proto_test.A = class {
   constructor() {
