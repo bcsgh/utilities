@@ -1,5 +1,5 @@
 load("@google_protobuf//:protobuf.bzl", "cc_proto_library")
-load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library", "closure_js_test")
+load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_test")
 load(":js_proto.bzl", "js_proto_extern")
 
 cc_library(
