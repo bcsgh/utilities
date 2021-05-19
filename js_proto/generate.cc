@@ -35,6 +35,7 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/memory/memory.h"
 #include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
       return 6;
     }
 
-    load_pool = std::make_unique<DescriptorPool>();
+    load_pool = absl::make_unique<DescriptorPool>();
     load_pool->AllowUnknownDependencies();
     file = load_pool->BuildFile(file_desc.file(0));
 

@@ -21,6 +21,7 @@ cc_binary(
         ":generate_extern",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/memory",
         "@google_protobuf//:protobuf",
     ],
 )
