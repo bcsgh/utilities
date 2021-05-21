@@ -26,7 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-Generate a closure externs file from a cc_proto_library rule.
+Generate a JS closure externs file from a proto_library rule.
 """
 
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library")
@@ -34,14 +34,18 @@ load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library")
 def _extract_proto_descriptor(ctx):
     ret = ctx.actions.declare_file(ctx.attr.out)
 
+    pi = ctx.attr.proto_library[ProtoInfo]
     ctx.actions.run(
-        inputs = depset(ctx.attr.cc_proto_library.proto.srcs + ctx.attr.cc_proto_library.proto.deps.to_list()),
+        inputs = depset(pi.direct_sources + pi.transitive_imports.to_list()),
         tools = [ctx.executable.protoc],
         outputs = [ret],
         arguments = [
+            "-I%s" % i
+            for i in pi.transitive_proto_path.to_list()
+        ] + [
             "--include_source_info",
             "--descriptor_set_out=" + ret.path,
-            ctx.attr.cc_proto_library.proto.srcs[0].path,
+            pi.direct_sources[0].path,
         ],
         executable = ctx.executable.protoc,
         mnemonic = "ProtoCompile",
@@ -55,7 +59,7 @@ extract_proto_descriptor = rule(
     implementation = _extract_proto_descriptor,
     attrs = {
         "out": attr.string(mandatory = True),
-        "cc_proto_library": attr.label(mandatory = True),
+        "proto_library": attr.label(mandatory = True),
         "protoc": attr.label(
             cfg = "host",
             executable = True,
@@ -97,12 +101,12 @@ js_proto_generate_extern = rule(
     },
 )
 
-def js_proto_extern(name = None, cc_proto_library = None, testonly = False):
-    """Generate a closure externs file from a cc_proto_library rule.
+def js_proto_extern(name = None, proto_library = None, testonly = False):
+    """Generate a closure externs file from a proto_library rule.
 
     Args:
       name: The target name.
-      cc_proto_library: a cc_proto_library lable to build from.
+      proto_library: a proto_library lable to build from.
       testonly: testonly
     """
     ext = name + "_generator_ext"
@@ -114,7 +118,7 @@ def js_proto_extern(name = None, cc_proto_library = None, testonly = False):
         testonly = testonly,
         out = desc,
         # See https://github.com/protocolbuffers/protobuf/blob/master/protobuf.bzl#L299
-        cc_proto_library = cc_proto_library + "_genproto",
+        proto_library = proto_library,
     )
 
     js_proto_generate_extern(

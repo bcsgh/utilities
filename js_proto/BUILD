@@ -1,6 +1,11 @@
-load("@google_protobuf//:protobuf.bzl", "cc_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_test")
 load(":js_proto.bzl", "js_proto_extern")
+
+cc_proto_library(
+    name = "descriptor_proto_cc",
+    deps = [ "@com_google_protobuf//:descriptor_proto"],
+)
 
 cc_library(
     name = "generate_extern",
@@ -9,7 +14,7 @@ cc_library(
     deps = [
         "@com_github_glog_glog//:glog",
         "@com_google_absl//absl/strings",
-        "@google_protobuf//:protobuf",
+        ":descriptor_proto_cc",
     ],
 )
 
@@ -22,25 +27,21 @@ cc_binary(
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
         "@com_google_absl//absl/memory",
-        "@google_protobuf//:protobuf",
+        ":descriptor_proto_cc",
     ],
 )
 
 ########################
-cc_proto_library(
+proto_library(
     name = "example2_proto",
     testonly = True,
     srcs = ["example2.proto"],
-    default_runtime = "@google_protobuf//:protobuf",
-    protoc = "@google_protobuf//:protoc",
 )
 
-cc_proto_library(
+proto_library(
     name = "example_proto",
     testonly = True,
     srcs = ["example.proto"],
-    default_runtime = "@google_protobuf//:protobuf",
-    protoc = "@google_protobuf//:protoc",
     deps = [":example2_proto"],
 )
 
@@ -48,13 +49,13 @@ cc_proto_library(
 js_proto_extern(
     name = "generate_example_js",
     testonly = True,
-    cc_proto_library = ":example_proto",
+    proto_library = ":example_proto",
 )
 
 js_proto_extern(
     name = "generate_example2_js",
     testonly = True,
-    cc_proto_library = ":example2_proto",
+    proto_library = ":example2_proto",
 )
 
 ########################
@@ -70,11 +71,17 @@ cc_library(
     ],
 )
 
+cc_proto_library(
+    name = "example_proto_cc",
+    testonly = True,
+    deps = [":example_proto"],
+)
+
 cc_test(
     name = "generate_extern_test",
     srcs = ["generate_extern_test.cc"],
     deps = [
-        ":example_proto",
+        ":example_proto_cc",
         ":generate_extern",
         ":test_main",
         "@com_google_googletest//:gtest",

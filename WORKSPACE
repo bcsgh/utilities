@@ -13,6 +13,25 @@ load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependen
 
 rules_foreign_cc_dependencies([])
 
+git_repository(
+    name = "rules_proto",
+    commit = "cfdc2fa31879c0aebe31ce7702b1a9c8a4be02d2",
+    init_submodules = 1,
+    remote = "https://github.com/bazelbuild/rules_proto.git",
+    shallow_since = "1612880706 +0100",
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
+
+rules_proto_dependencies()
+#NOTE: might also need rules_proto_toolchains()?
+
+"""
+NOTE: might also need:
+load("@rules_cc//cc:repositories.bzl", "rules_cc_dependencies")
+rules_cc_dependencies()
+"""
+
 # https://github.com/bazelbuild/rules_closure
 git_repository(
     name = "io_bazel_rules_closure",
@@ -58,10 +77,3 @@ git_repository(
 )
 
 #############################################
-git_repository(
-    name = "google_protobuf",
-    commit = "2514f0bd7da7e2af1bed4c5d1b84f031c4d12c10",  #tag = "v3.14.0",
-    init_submodules = 1,
-    remote = "https://github.com/google/protobuf.git",
-    shallow_since = "1605300819 -0800",
-)
