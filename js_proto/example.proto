@@ -19,12 +19,12 @@ message A {
 
     repeated string g = 7;
     repeated bytes h = 8;
-    
+
     repeated float i = 9;
     repeated double j = 10;
 
     repeated bool o = 15;
-    
+
     enum E_Inner {
       I = 1;
       J = 2;
@@ -32,6 +32,7 @@ message A {
     }
   }
   required A_Inner inner_type = 1;
+  optional A_Inner.E_Inner e = 2;
 }
 
 enum E {

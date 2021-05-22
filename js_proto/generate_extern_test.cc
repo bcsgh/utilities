@@ -63,6 +63,8 @@ js_proto_test.A = class {
   constructor() {
     /** @type {!js_proto_test.A.A_Inner} */
     this.inner_type;  // message
+    /** @type {?js_proto_test.A.A_Inner.E_Inner} */
+    this.e;  // enum
   }
 };
 )JS", R"JS(
@@ -101,6 +103,13 @@ js_proto_test.A.A_Inner = class {
   }
 };
 )JS", R"JS(
+/** @enum {number} */
+js_proto_test.A.A_Inner.E_Inner = {
+  I: 1,
+  J: 2,
+  K: 3,
+};
+)JS", R"JS(
 js_proto_test.B = class {
   constructor() {
     /** @type {?js_proto_test.A.A_Inner} */
@@ -110,6 +119,13 @@ js_proto_test.B = class {
     /** @type {?Array<!js_proto_test2.Imp>} */
     this.imp;  // message
   }
+};
+)JS", R"JS(
+/** @enum {number} */
+js_proto_test.E = {
+  Z: 1,
+  Y: 2,
+  X: 3,
 };
 )JS", R"JS(
 // done

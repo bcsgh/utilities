@@ -43,16 +43,6 @@ using google::protobuf::FieldDescriptor;
 using google::protobuf::FileDescriptor;
 
 //////////////////////////////////////////////////////////////////////////////
-void ProtoJsonApi::ProcessEnum(const std::string& js_package,
-                               const EnumDescriptor* enu) {
-  LOG(INFO) << "ENUM " << enu->full_name();
-  const int val_c = enu->value_count();
-  for (int val_i = 0; val_i < val_c; val_i++) {
-    auto val = enu->value(val_i);
-    LOG(INFO) << "VALUE " << val->name() << " = " << val->number();
-  }
-}
-
 template <class T>
 static std::string JsTypeName(const T* des) {
   auto package = des->file()->package();
@@ -107,7 +97,13 @@ std::string ProtoJsonApi::TypeString(const FieldDescriptor* field) {
     }
 
     case FieldDescriptor::TYPE_ENUM: {
-      type = field->type_name();
+
+      if (field->file()->name() != field->enum_type()->file()->name()) {
+        LOG(INFO) << "External: " << field->enum_type()->full_name() << " @"
+                  << field->enum_type()->file()->name();
+        requiered_.insert(field->enum_type()->full_name());
+      }
+      type = JsTypeName(field->enum_type());
       break;
     }
   }
@@ -130,6 +126,21 @@ std::string ProtoJsonApi::TypeString(const FieldDescriptor* field) {
   }
 
   return type;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void ProtoJsonApi::ProcessEnum(const std::string& js_package,
+                               const EnumDescriptor* enu) {
+  LOG(INFO) << "ENUM " << enu->full_name();
+
+  blobs_.emplace_back(absl::StrCat("/** @enum {number} */\n", JsTypeName(enu), " = {"));
+  const int val_c = enu->value_count();
+  for (int val_i = 0; val_i < val_c; val_i++) {
+    auto val = enu->value(val_i);
+    LOG(INFO) << "VALUE " << val->name() << " = " << val->number();
+    blobs_.emplace_back(absl::StrCat("  ", val->name(), ": ", val->number(), ","));
+  }
+  blobs_.emplace_back("};\n");
 }
 
 //////////////////////////////////////////////////////////////////////////////
