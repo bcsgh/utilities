@@ -24,10 +24,11 @@ cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":generate_extern",
+        ":descriptor_proto_cc",
+        "@com_github_glog_glog//:glog",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
         "@com_google_absl//absl/memory",
-        ":descriptor_proto_cc",
     ],
 )
 
