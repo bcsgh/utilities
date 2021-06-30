@@ -12,9 +12,9 @@ cc_library(
     srcs = ["generate_extern.cc"],
     hdrs = ["generate_extern.h"],
     deps = [
+        ":descriptor_proto_cc",
         "@com_github_glog_glog//:glog",
         "@com_google_absl//absl/strings",
-        ":descriptor_proto_cc",
     ],
 )
 
@@ -23,8 +23,8 @@ cc_binary(
     srcs = ["generate.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        ":generate_extern",
         ":descriptor_proto_cc",
+        ":generate_extern",
         "@com_github_glog_glog//:glog",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
