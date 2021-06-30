@@ -4,7 +4,7 @@ load(":js_proto.bzl", "js_proto_extern")
 
 cc_proto_library(
     name = "descriptor_proto_cc",
-    deps = [ "@com_google_protobuf//:descriptor_proto"],
+    deps = ["@com_google_protobuf//:descriptor_proto"],
 )
 
 cc_library(
