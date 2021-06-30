@@ -26,6 +26,7 @@ load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
 rules_proto_dependencies()
 #NOTE: might also need rules_proto_toolchains()?
 
+# buildifier: disable=no-effect
 """
 NOTE: might also need:
 load("@rules_cc//cc:repositories.bzl", "rules_cc_dependencies")
