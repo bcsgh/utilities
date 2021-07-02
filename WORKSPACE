@@ -4,9 +4,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "rules_foreign_cc",
-    commit = "e1f6efeda355208947efb117219af613f7eef712",  # current as of 2021/06/15
+    commit = "6d1d16d3bb1c09a5154b483de902755ce1f05746",  # current as of 2021/07/01
     remote = "git://github.com/bazelbuild/rules_foreign_cc.git",
-    shallow_since = "1623777319 -0700",
+    shallow_since = "1625108995 -0700",
 )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
@@ -56,25 +56,25 @@ git_repository(
 #############################################
 git_repository(
     name = "com_github_glog_glog",
-    commit = "764162569a26da4401a8b59c96ca3525d7618a28",  # current as of 2021/06/15
+    commit = "6e46c125e3718ce64570883e2ca558b3c853a125",  # current as of 2021/07/01
     remote = "git://github.com/google/glog.git",
-    shallow_since = "1623780547 +0200",
+    shallow_since = "1625119458 +0200",
 )
 
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "e2239ee6043f73722e7aa812a459f54a28552929",  # current as of 2021/06/15
+    commit = "4ec4cd23f486bf70efcc5d2caa40f24368f752e3",  # current as of 2021/07/01
     remote = "git://github.com/google/googletest.git",
-    shallow_since = "1623433346 -0700",
+    shallow_since = "1625074437 -0400",
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "311bbd2e50ea35e921a08186840d3b6ca279e880",  # current as of 2021/06/15
+    commit = "9a7e447c511dae7276ab65fde4d04f6ed52b39c9",  # current as of 2021/07/01
     remote = "git://github.com/abseil/abseil-cpp.git",
-    shallow_since = "1623359638 -0400",
+    shallow_since = "1624810227 -0400",
 )
 
 #############################################
