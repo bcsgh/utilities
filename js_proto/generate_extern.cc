@@ -29,11 +29,11 @@
 
 #include <iostream>
 
+#include "absl/log/log.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
-#include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
 
 namespace js_proto {

@@ -35,8 +35,9 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/log/initialize.h"
+#include "absl/log/log.h"
 #include "absl/memory/memory.h"
-#include "glog/logging.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "js_proto/generate_extern.h"
@@ -55,7 +56,7 @@ using google::protobuf::FileDescriptorSet;
 
 int main(int argc, char** argv) {
   auto args = absl::ParseCommandLine(argc, argv);
-  google::InitGoogleLogging(args[0]);
+  absl::InitializeLog();
 
   const FileDescriptor* file = nullptr;
 

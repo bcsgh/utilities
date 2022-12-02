@@ -13,7 +13,7 @@ cc_library(
     hdrs = ["generate_extern.h"],
     deps = [
         ":descriptor_proto_cc",
-        "@com_github_glog_glog//:glog",
+        "@com_google_absl//absl/log:log",
         "@com_google_absl//absl/strings",
     ],
 )
@@ -25,9 +25,10 @@ cc_binary(
     deps = [
         ":descriptor_proto_cc",
         ":generate_extern",
-        "@com_github_glog_glog//:glog",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/log:initialize",
+        "@com_google_absl//absl/log:log",
         "@com_google_absl//absl/memory",
     ],
 )
@@ -64,9 +65,10 @@ cc_library(
     name = "test_main",
     srcs = ["test_main.cc"],
     deps = [
-        "@com_github_glog_glog//:glog",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/log:initialize",
+        "@com_google_absl//absl/log:log",
         "@com_google_absl//absl/time",
         "@com_google_googletest//:gtest",
     ],

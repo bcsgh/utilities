@@ -54,23 +54,6 @@ load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_depende
 rules_closure_dependencies()  # needed for @rules_python//...
 
 #############################################
-# needed by com_github_glog_glog
-git_repository(
-    name = "com_github_gflags_gflags",
-    commit = "a738fdf9338412f83ab3f26f31ac11ed3f3ec4bd",  # current as of 2022/10/25
-    remote = "https://github.com/gflags/gflags.git",
-    shallow_since = "1658955969 +0100",
-)
-
-#############################################
-git_repository(
-    name = "com_github_glog_glog",
-    commit = "05fbc65278db1aa545ca5cb743c31bc717a48d0f",  # current as of 2022/10/25
-    remote = "https://github.com/google/glog.git",
-    shallow_since = "1663772402 +0200",
-)
-
-#############################################
 git_repository(
     name = "com_google_googletest",
     commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25

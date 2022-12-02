@@ -27,10 +27,10 @@
 
 #include "js_proto/generate_extern.h"
 
+#include "absl/log/log.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "glog/logging.h"
 #include "gmock/gmock.h"
 #include "google/protobuf/descriptor.h"
 #include "gtest/gtest.h"
