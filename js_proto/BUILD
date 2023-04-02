@@ -95,7 +95,7 @@ closure_js_test(
     name = "generate_example_test",
     srcs = ["generate_example_test.js"],
     compilation_level = "ADVANCED",
-    entry_points = ["js_proto/generate_example_test.js"],
+    entry_points = ["js_proto.generateExample_test"],
     suppress = ["moduleLoad"],
     deps = [
         ":generate_example2_js",
