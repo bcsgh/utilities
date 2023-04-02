@@ -24,10 +24,9 @@ http_archive(
 
 git_repository(
     name = "rules_proto",
-    commit = "cfdc2fa31879c0aebe31ce7702b1a9c8a4be02d2",
-    init_submodules = 1,
+    commit = "f371ed34ed7f1a8b83cc34ae96db277e0ba4fcb0",  # tag=5.3.0-21.5 + f371ed3
     remote = "https://github.com/bazelbuild/rules_proto.git",
-    shallow_since = "1612880706 +0100",
+    shallow_since = "1664409030 -0700",
 )
 
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
@@ -55,18 +54,18 @@ rules_closure_dependencies()  # needed for @rules_python//...
 
 #############################################
 git_repository(
-    name = "com_google_googletest",
-    commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25
-    remote = "https://github.com/google/googletest.git",
-    shallow_since = "1666712359 -0700",
-)
-
-#############################################
-git_repository(
     name = "com_google_absl",
     commit = "827940038258b35a29279d8c65b4b4ca0a676f8d",  # current as of 2022/10/27
     remote = "https://github.com/abseil/abseil-cpp.git",
     shallow_since = "1666903548 -0700",
+)
+
+#############################################
+git_repository(
+    name = "com_google_googletest",
+    commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25
+    remote = "https://github.com/google/googletest.git",
+    shallow_since = "1666712359 -0700",
 )
 
 #############################################
