@@ -100,8 +100,8 @@ closure_js_test(
     deps = [
         ":generate_example2_js",
         ":generate_example_js",
-        "@io_bazel_rules_closure//closure/library/testing:asserts",
-        "@io_bazel_rules_closure//closure/library/testing:jsunit",
-        "@io_bazel_rules_closure//closure/library/testing:testsuite",
+        "@com_google_javascript_closure_library//closure/goog/testing:asserts",
+        "@com_google_javascript_closure_library//closure/goog/testing:jsunit",
+        "@com_google_javascript_closure_library//closure/goog/testing:testsuite",
     ],
 )

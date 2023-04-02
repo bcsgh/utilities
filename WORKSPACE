@@ -45,12 +45,15 @@ rules_cc_dependencies()
 git_repository(
     name = "io_bazel_rules_closure",
     remote = "https://github.com/bazelbuild/rules_closure.git",
-    tag = "0.11.0",
+    commit = "7860dec6f1d7870d720ea6ef3f599c0397866fc9",
+    shallow_since = "1678130212 -0800",
 )
 
-load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies")
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
 
 rules_closure_dependencies()  # needed for @rules_python//...
+
+rules_closure_toolchains()
 
 #############################################
 git_repository(
