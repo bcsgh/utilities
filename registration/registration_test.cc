@@ -64,5 +64,22 @@ TEST(RegistrationTest, Other) {
   EXPECT_THAT(made, SizeIs(1));
 }
 
+struct BArg {
+  using MakeArgs = std::tuple<int>;
+  virtual int F() = 0;
+};
+
+struct DArg : public BArg {
+  DArg(int i) : i_(i) {}
+  int F() override { return i_; }
+  int i_;
+};
+Register<BArg, DArg> barg_darg_test;
+
+TEST(RegistrationTest, Arg) {
+  auto made = Registrar<BArg>::Make(1);
+  EXPECT_THAT(made, SizeIs(1));
+}
+
 }  // namespace
 }  // namespace registration

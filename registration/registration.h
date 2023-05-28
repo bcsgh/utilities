@@ -61,17 +61,38 @@ std::vector<std::unique_ptr<AbstractBaseClass>> made =
     Registrar<AbstractBaseClass>::Make();
 */
 
+// If the derived class constructors need to take arguments, then the base class
+// needs to define a nested type alias of std::tuple<...> holding the types to
+// forward ro each derived class. When Base::MakeArgs is not empty, *only*
+// Registrar::MakeArgs is usable and Registrar::GetDefault is disabled.
+
+/*
+struct AbstractBaseClass { using MakeArgs = std::tuple<std::string>; };
+
+namespace {
+struct ConcreteDerivedClass : public AbstractBaseClass {
+ public:
+  ConcreteDerivedClass(std::string);
+  ConcreteDerivedClass() = delete;
+};
+Register<AbstractBaseClass, ConcreteDerivedClass> unique_name;
+}  // namespace
+
+auto made = Registrar<AbstractBaseClass>::Make("Hello world");
+*/
+
 template <class Base>
 class Registrar {
  public:
   // Construct one new instance of each type registered.
   // Ownership is transferred to the called.
-  static std::vector<std::unique_ptr<Base>> Make() {
+  template<class... C>
+  static std::vector<std::unique_ptr<Base>> Make(const C &...c) {
     auto *r = Get();
 
     std::vector<std::unique_ptr<Base>> ret;
     ret.reserve(r->factories_.size());
-    for (const auto& f : r->factories_) ret.emplace_back(f());
+    for (const auto& f : r->factories_) ret.emplace_back(f(c...));
     return ret;
   }
 
@@ -79,6 +100,10 @@ class Registrar {
   // These are on on-demand constructed once
   // per process and ownership is retained.
   static const std::vector<Base*>& GetDefault() {
+    static_assert(std::is_same<
+            typename has_make::type,
+            std::function<std::unique_ptr<Base>()>>::value,
+        "Registrar<B>::GetDefault() disabled where B::MakeArgs is not empty.");
     // grab this only the first time.
     static auto *hold = new auto{Make()};
     static auto *ret = [] {
@@ -101,7 +126,21 @@ class Registrar {
 
   template<class, class> friend struct Register;
 
-  std::list<std::function<std::unique_ptr<Base>()>> factories_;
+  template<class t>
+  struct has_make_t {
+    template<class... c>
+    static std::function<std::unique_ptr<Base>(c...)> convert(std::tuple<c...>);
+    using type = decltype(convert(std::declval<t>()));
+  };
+
+  // SFINAE magic to extract the arguments.
+  template<class C>
+  static has_make_t<typename C::MakeArgs> HasMake(typename C::MakeArgs*);
+  template<class C>
+  static has_make_t<std::tuple<>> HasMake(...);
+  using has_make = decltype(HasMake<Base>(nullptr));
+
+  std::list<typename has_make::type> factories_;
 };
 
 template <class Base, class Derived>
@@ -109,8 +148,8 @@ struct Register {
   Register() {
     static auto _ = [] {  // Do this only once per type.
       auto *r = Registrar<Base>::Get();
-      r->factories_.emplace_back([] {
-        return std::unique_ptr<Base>{new Derived};
+      r->factories_.emplace_back([](const auto&... ts) {
+        return std::unique_ptr<Base>{new Derived{ts...}};
       });
       return nullptr;
     }();
