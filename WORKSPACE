@@ -45,8 +45,8 @@ rules_cc_dependencies()
 git_repository(
     name = "io_bazel_rules_closure",
     remote = "https://github.com/bazelbuild/rules_closure.git",
-    commit = "7860dec6f1d7870d720ea6ef3f599c0397866fc9",
-    shallow_since = "1678130212 -0800",
+    commit = "ac78ac89f554e8b18c497d306832dbb86f51087a",  # current as of 2023/11/12
+    shallow_since = "1699644137 -0800",
 )
 
 load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
@@ -58,17 +58,17 @@ rules_closure_toolchains()
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "827940038258b35a29279d8c65b4b4ca0a676f8d",  # current as of 2022/10/27
+    commit = "483a2d59e649179ea9d9bc4d808f6c9d16646f9d",  # current as of 2023/11/12
     remote = "https://github.com/abseil/abseil-cpp.git",
-    shallow_since = "1666903548 -0700",
+    shallow_since = "1699496241 -0800",
 )
 
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "3026483ae575e2de942db5e760cf95e973308dd5",  # current as of 2022/10/25
+    commit = "b10fad38c4026a29ea6561ab15fc4818170d1c10",  # current as of 2023/11/12
     remote = "https://github.com/google/googletest.git",
-    shallow_since = "1666712359 -0700",
+    shallow_since = "1698701593 -0700",
 )
 
 #############################################
