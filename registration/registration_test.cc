@@ -81,5 +81,29 @@ TEST(RegistrationTest, Arg) {
   EXPECT_THAT(made, SizeIs(1));
 }
 
+struct BY {
+  virtual int F() = 0;
+  typedef int RegistrationKeyType;
+};
+
+template<int i, int y = 0>
+struct DY : public BY {
+  static constexpr int RegistrationKey = i;
+  int F() override { return i + y; }
+};
+Register<BY, DY<1> > by_dy1_test;
+Register<BY, DY<2> > by_dy2_test;
+Register<BY, DY<2, 2> > by_dy22_test;
+
+TEST(RegistrationTest, Filter) {
+  EXPECT_THAT(Registrar<BY>::Make(), SizeIs(3));
+
+  auto v0 = Registrar<BY>::MakeOnly(0);
+  auto v1 = Registrar<BY>::MakeOnly(1);
+  auto v2 = Registrar<BY>::MakeOnly(2);
+  EXPECT_THAT(v0, SizeIs(0));
+  EXPECT_THAT(v1, SizeIs(1));
+  EXPECT_THAT(v2, SizeIs(2));
+}
 }  // namespace
 }  // namespace registration

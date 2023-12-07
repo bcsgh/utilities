@@ -62,9 +62,10 @@ std::vector<std::unique_ptr<AbstractBaseClass>> made =
 */
 
 // If the derived class constructors need to take arguments, then the base class
-// needs to define a nested type alias of std::tuple<...> holding the types to
-// forward ro each derived class. When Base::MakeArgs is not empty, *only*
-// Registrar::MakeArgs is usable and Registrar::GetDefault is disabled.
+// needs to define a nested type alias of std::tuple<...> called MakeArgs
+// holding the types to forward to each derived class. When Base::MakeArgs is
+// not empty, *only* Registrar::Make is usable and Registrar::GetDefault is
+// disabled.
 
 /*
 struct AbstractBaseClass { using MakeArgs = std::tuple<std::string>; };
@@ -81,8 +82,16 @@ Register<AbstractBaseClass, ConcreteDerivedClass> unique_name;
 auto made = Registrar<AbstractBaseClass>::Make("Hello world");
 */
 
+// If the base class defines a type alias called RegistrationKeyType then
+// MakeOnly(k, ...) may be used like Make(). Derived classes must define a
+// constexpr static Base::RegistrationKeyType member named RegistrationKey and
+// MakeOnly(k, ...) will only construct types where k==Derived::RegistrationKey.
+
 template <class Base>
 class Registrar {
+  // For SFINAE
+  template<class T> struct mix { using t = Base; };
+
  public:
   // Construct one new instance of each type registered.
   // Ownership is transferred to the called.
@@ -92,7 +101,22 @@ class Registrar {
 
     std::vector<std::unique_ptr<Base>> ret;
     ret.reserve(r->factories_.size());
-    for (const auto& f : r->factories_) ret.emplace_back(f(c...));
+    for (const auto& f : r->factories_) ret.emplace_back(f.fn(c...));
+    return ret;
+  }
+
+  template<class F, class... C>
+  static std::vector<std::unique_ptr<Base>> MakeOnly(const F &k, const C &...c) {
+    static_assert(sizeof(typename Base::RegistrationKeyType) >= 0);
+
+    auto *r = Get();
+
+    std::vector<std::unique_ptr<Base>> ret;
+    ret.reserve(r->factories_.size());
+    for (const auto& f : r->factories_) {
+      if (k != f.key) continue;
+      ret.emplace_back(f.fn(c...));
+    }
     return ret;
   }
 
@@ -140,7 +164,22 @@ class Registrar {
   static has_make_t<std::tuple<>> HasMake(...);
   using has_make = decltype(HasMake<Base>(nullptr));
 
-  std::list<typename has_make::type> factories_;
+  struct Factory {
+    // Compute all the key stuff
+    template<class T, class V = typename mix<T>::t::RegistrationKeyType>
+    static V MakeKey(T*) { return static_cast<V>(T::RegistrationKey); }
+    static char MakeKey(...) { return 0; }
+    using key_type = decltype(MakeKey(std::declval<Base*>()));
+
+    typename has_make::type fn;
+    key_type key;
+
+    Factory(typename has_make::type f, key_type k)
+        : fn(std::move(f)),
+          key(k) {}
+  };
+
+  std::list<Factory> factories_;
 };
 
 template <class Base, class Derived>
@@ -148,9 +187,10 @@ struct Register {
   Register() {
     static auto _ = [] {  // Do this only once per type.
       auto *r = Registrar<Base>::Get();
-      r->factories_.emplace_back([](const auto&... ts) {
+      using BF = typename Registrar<Base>::Factory;
+      r->factories_.emplace_back(BF([](const auto&... ts) {
         return std::unique_ptr<Base>{new Derived{ts...}};
-      });
+      }, BF::MakeKey(static_cast<Derived*>(nullptr))));
       return nullptr;
     }();
     (void)_;  // Ignore unused.
