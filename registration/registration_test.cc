@@ -55,6 +55,8 @@ TEST(RegistrationTest, Basic) {
   EXPECT_THAT(v, UnorderedElementsAre(6, 9));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 struct BX { virtual void F() = 0; };
 struct DX : public BX { void F() override {} };
 Register<BX, DX> bx_dx_test;
@@ -63,6 +65,8 @@ TEST(RegistrationTest, Other) {
   auto made = Registrar<BX>::GetDefault();
   EXPECT_THAT(made, SizeIs(1));
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 struct BArg {
   using MakeArgs = std::tuple<int>;
@@ -79,7 +83,14 @@ Register<BArg, DArg> barg_darg_test;
 TEST(RegistrationTest, Arg) {
   auto made = Registrar<BArg>::Make(1);
   EXPECT_THAT(made, SizeIs(1));
+
+  std::set<int> v;
+  for (const auto& i : made) v.insert(i->F());
+  EXPECT_THAT(v, SizeIs(1));
+  EXPECT_THAT(v, UnorderedElementsAre(1));
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 struct BY {
   virtual int F() = 0;
@@ -104,6 +115,9 @@ TEST(RegistrationTest, Filter) {
   EXPECT_THAT(v0, SizeIs(0));
   EXPECT_THAT(v1, SizeIs(1));
   EXPECT_THAT(v2, SizeIs(2));
+
+  EXPECT_THAT(Registrar<BY>::GetKeys(),
+              UnorderedElementsAre(1, 2));
 }
 }  // namespace
 }  // namespace registration

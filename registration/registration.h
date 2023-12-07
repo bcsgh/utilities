@@ -31,6 +31,7 @@
 #include <functional>
 #include <list>
 #include <memory>
+#include <set>
 #include <vector>
 
 namespace registration {
@@ -117,6 +118,16 @@ class Registrar {
       if (k != f.key) continue;
       ret.emplace_back(f.fn(c...));
     }
+    return ret;
+  }
+
+  template<class B = Base, class K = typename B::RegistrationKeyType>
+  static std::set<K> GetKeys() {
+    static_assert(std::is_same<B, Base>::value);
+    static_assert(std::is_same<K, typename B::RegistrationKeyType>::value);
+
+    std::set<K> ret;
+    for (const auto& f : Get()->factories_) ret.emplace(f.key);
     return ret;
   }
 
