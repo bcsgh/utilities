@@ -33,6 +33,7 @@
 namespace registration {
 
 struct B {
+  virtual ~B() = default;
   virtual int F() = 0;
 };
 

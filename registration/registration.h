@@ -93,6 +93,10 @@ class Registrar {
   // For SFINAE
   template<class T> struct mix { using t = Base; };
 
+  // A base class without a virtual destructor is a huge foot-gun.
+  // Just forbid it and force people to deal with it.
+  static_assert(std::has_virtual_destructor<Base>::value);
+
  public:
   // Construct one new instance of each type registered.
   // Ownership is transferred to the called.

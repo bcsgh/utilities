@@ -57,7 +57,10 @@ TEST(RegistrationTest, Basic) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct BX { virtual void F() = 0; };
+struct BX {
+  virtual ~BX() = default;
+  virtual void F() = 0;
+};
 struct DX : public BX { void F() override {} };
 Register<BX, DX> bx_dx_test;
 
@@ -69,6 +72,7 @@ TEST(RegistrationTest, Other) {
 ////////////////////////////////////////////////////////////////////////////////
 
 struct BArg {
+  virtual ~BArg() = default;
   using MakeArgs = std::tuple<int>;
   virtual int F() = 0;
 };
@@ -93,6 +97,7 @@ TEST(RegistrationTest, Arg) {
 ////////////////////////////////////////////////////////////////////////////////
 
 struct BY {
+  virtual ~BY() = default;
   virtual int F() = 0;
   typedef int RegistrationKeyType;
 };
